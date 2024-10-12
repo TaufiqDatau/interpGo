@@ -17,6 +17,7 @@ const(
 
   IDENT   = "IDENT"
   INT     = "INT"
+  FLOAT   = "FLOAT"
   ASSIGN  = "="
   PLUS    = "+"
   

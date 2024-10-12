@@ -78,11 +78,21 @@ func readIdentifier(l *Lexer) string{
 }
 
 func readNumber(l *Lexer) (string, token.TokenType){
+  isFloat := false;
   position := l.position
-  for isDigit(l.ch){
+  for isDigit(l.ch) || l.ch == '.'{
+    if l.ch == '.'{
+      isFloat = true
+    }
     l.readChar()
   }
-  return l.input[position:l.position], token.INT
+  var tokenType string
+  if isFloat{
+    tokenType = token.FLOAT
+  }else{
+    tokenType = token.INT
+  }
+  return l.input[position:l.position], token.TokenType(tokenType) 
 }
 
 func newToken(tokenType token.TokenType, ch byte) token.Token  {
