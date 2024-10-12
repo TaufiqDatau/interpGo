@@ -18,8 +18,22 @@ const(
   IDENT   = "IDENT"
   INT     = "INT"
   FLOAT   = "FLOAT"
+
+  //Operators
   ASSIGN  = "="
   PLUS    = "+"
+  MINUS   = "-"
+  ASTERISK= "*"
+  SLASH   = "/"
+  BANG    = "!"
+  
+  //Comparator
+  LT      = "<"
+  GT      = ">"
+  LTE     = "<="
+  GTE     = ">="
+  EQ      = "=="
+  NEQ     = "!="
   
   // Delimiters
   COMMA = ","
@@ -32,6 +46,7 @@ const(
   // Keywords
   FUNCTION = "FUNCTION"
   LET = "LET"
+
 )
 var keywords = map[string]TokenType{
   "fn": FUNCTION,

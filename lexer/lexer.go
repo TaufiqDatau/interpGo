@@ -35,9 +35,45 @@ func (l *Lexer) NextToken() token.Token{
 
   switch l.ch{
   case '=':
-    tok = newToken(token.ASSIGN, l.ch)
+    if l.peekNext() == '='{
+      l.readChar()
+      tok.Literal = "=="
+      tok.Type = token.EQ
+    } else{
+      tok = newToken(token.ASSIGN, l.ch)
+    }
   case '+':
     tok = newToken(token.PLUS, l.ch)
+  case '-':
+    tok = newToken(token.MINUS, l.ch)
+  case '*':
+    tok = newToken(token.ASTERISK, l.ch)
+  case '/':
+    tok = newToken(token.SLASH, l.ch)
+  case '!':
+    if l.peekNext() == '='{
+      l.readChar()
+      tok.Literal = "!="
+      tok.Type = token.NEQ
+    }else{
+      tok = newToken(token.BANG, l.ch)
+    }
+  case '<':
+    if l.peekNext() == '='{
+      l.readChar()
+      tok.Type = token.LTE
+      tok.Literal = "<="
+    }else{
+      tok = newToken(token.LT, l.ch)
+    }
+  case '>':
+    if l.peekNext() == '='{
+      l.readChar()
+      tok.Type = token.GTE
+      tok.Literal = ">="
+    }else{
+      tok = newToken(token.GT, l.ch)
+    }
   case ',':
     tok = newToken(token.COMMA, l.ch)
   case ';':
@@ -111,4 +147,9 @@ func (l *Lexer)skipWhiteSpaces(){
   for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r'{
     l.readChar()
   } 
+}
+
+func (l *Lexer)peekNext() byte{
+  nextPos := l.position +1
+  return l.input[nextPos]
 }
