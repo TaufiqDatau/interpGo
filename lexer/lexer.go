@@ -151,5 +151,9 @@ func (l *Lexer)skipWhiteSpaces(){
 
 func (l *Lexer)peekNext() byte{
   nextPos := l.position +1
+  if nextPos > len(l.input){
+    return 0
+  }
+  
   return l.input[nextPos]
 }

@@ -18,6 +18,7 @@ const(
   IDENT   = "IDENT"
   INT     = "INT"
   FLOAT   = "FLOAT"
+  BOOL    = "BOOLEAN"
 
   //Operators
   ASSIGN  = "="
@@ -46,11 +47,20 @@ const(
   // Keywords
   FUNCTION = "FUNCTION"
   LET = "LET"
-
+  IF = "IF"
+  ELSE = "ELSE"
+  ELIF = "ELIF"
+  RETURN = "RETURN"
 )
 var keywords = map[string]TokenType{
   "fn": FUNCTION,
   "let": LET,
+  "if" : IF,
+  "else": ELSE,
+  "return": RETURN,
+  "elif" : ELIF,
+  "true" : BOOL,
+  "false": BOOL,
 }
 
 func LookupIndent(indent string) TokenType{
