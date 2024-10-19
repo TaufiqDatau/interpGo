@@ -1,5 +1,6 @@
 package token
 
+
 /*
 Defined the TokenType type to be a string. That allows us to use many different values
 as TokenTypes, which in turn allows us to distinguish between different types of tokens.
@@ -71,3 +72,4 @@ func LookupIndent(indent string) TokenType {
 
 	return IDENT
 }
+
