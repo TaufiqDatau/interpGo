@@ -7,28 +7,28 @@ import (
 )
 
 func TestNextToken(t *testing.T) {
-	input := `let five = 5.0;
-    let ten = 10;
-let add = fn(x, y) {
+	input := `paring five = 5.0;
+    paring ten = 10;
+paring add = fn(x, y) {
 x + y;
 };
-let result = add(five, ten);
+paring result = add(five, ten);
 `
 	tests := []struct {
 		expectedType    token.TokenType
 		expectedLiteral string
 	}{
-		{token.LET, "let"},
+		{token.LET, "paring"},
 		{token.IDENT, "five"},
 		{token.ASSIGN, "="},
 		{token.FLOAT, "5.0"},
 		{token.SEMICOLON, ";"},
-		{token.LET, "let"},
+		{token.LET, "paring"},
 		{token.IDENT, "ten"},
 		{token.ASSIGN, "="},
 		{token.INT, "10"},
 		{token.SEMICOLON, ";"},
-		{token.LET, "let"},
+		{token.LET, "paring"},
 		{token.IDENT, "add"},
 		{token.ASSIGN, "="},
 		{token.FUNCTION, "fn"},
@@ -44,7 +44,7 @@ let result = add(five, ten);
 		{token.SEMICOLON, ";"},
 		{token.RBRACE, "}"},
 		{token.SEMICOLON, ";"},
-		{token.LET, "let"},
+		{token.LET, "paring"},
 		{token.IDENT, "result"},
 		{token.ASSIGN, "="},
 		{token.IDENT, "add"},
@@ -76,12 +76,12 @@ let result = add(five, ten);
 }
 
 func TestMoreToken(t *testing.T) {
-	input := `let five = 5;
-let ten = 10;
-let add = fn(x, y) {
+	input := `paring five = 5;
+paring ten = 10;
+paring add = fn(x, y) {
 x + y;
 };
-let result = add(five, ten);
+paring result = add(five, ten);
 !-/*5;
 5 < 10 > 5;
 if (5 < 10) {
@@ -101,17 +101,17 @@ if (false) {
 		expectedType    token.TokenType
 		expectedLiteral string
 	}{
-		{token.LET, "let"},
+		{token.LET, "paring"},
 		{token.IDENT, "five"},
 		{token.ASSIGN, "="},
 		{token.INT, "5"},
 		{token.SEMICOLON, ";"},
-		{token.LET, "let"},
+		{token.LET, "paring"},
 		{token.IDENT, "ten"},
 		{token.ASSIGN, "="},
 		{token.INT, "10"},
 		{token.SEMICOLON, ";"},
-		{token.LET, "let"},
+		{token.LET, "paring"},
 		{token.IDENT, "add"},
 		{token.ASSIGN, "="},
 		{token.FUNCTION, "fn"},
@@ -127,7 +127,7 @@ if (false) {
 		{token.SEMICOLON, ";"},
 		{token.RBRACE, "}"},
 		{token.SEMICOLON, ";"},
-		{token.LET, "let"},
+		{token.LET, "paring"},
 		{token.IDENT, "result"},
 		{token.ASSIGN, "="},
 		{token.IDENT, "add"},
