@@ -9,27 +9,28 @@ import (
 )
 
 const PROMPT = ">>"
-func Start(in io.Reader, ou io.Writer){
-  scanner := bufio.NewScanner(in)
 
-  for{
-    fmt.Printf(PROMPT)
-    scanned := scanner.Scan()
+func Start(in io.Reader, ou io.Writer) {
+	scanner := bufio.NewScanner(in)
 
-    if !scanned{
-      return
-    }
+	for {
+		fmt.Print(PROMPT)
+		scanned := scanner.Scan()
 
-    line := scanner.Text()
+		if !scanned {
+			return
+		}
 
-    if line == "exit" || line == "quit" {
-        fmt.Println("Exiting REPL...")
-        return
-    }
-    l := lexer.New(line)
+		line := scanner.Text()
 
-    for tok:= l.NextToken(); tok.Type != token.EOF; tok = l.NextToken(){
-      fmt.Printf("%+v\n", tok)
-    }
-  }
+		if line == "exit" || line == "quit" {
+			fmt.Println("Exiting REPL...")
+			return
+		}
+		l := lexer.New(line)
+
+		for tok := l.NextToken(); tok.Type != token.EOF; tok = l.NextToken() {
+			fmt.Printf("%+v\n", tok)
+		}
+	}
 }
