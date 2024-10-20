@@ -85,16 +85,16 @@ paring result = add(five, ten);
 !-/*5;
 5 < 10 > 5;
 if (5 < 10) {
-return true;
+balikne true;
 } else {
-return false;
+balikne false;
 }
 10 == 10;
 10 != 9;
 if (false) {
-  return false
+  balikne false
 } elif (true){
-  return true
+  balikne true
 }
 `
 	tests := []struct {
@@ -156,13 +156,13 @@ if (false) {
 		{token.INT, "10"},
 		{token.RPAREN, ")"},
 		{token.LBRACE, "{"},
-		{token.RETURN, "return"},
+		{token.RETURN, "balikne"},
 		{token.BOOL, "true"},
 		{token.SEMICOLON, ";"},
 		{token.RBRACE, "}"},
 		{token.ELSE, "else"},
 		{token.LBRACE, "{"},
-		{token.RETURN, "return"},
+		{token.RETURN, "balikne"},
 		{token.BOOL, "false"},
 		{token.SEMICOLON, ";"},
 		{token.RBRACE, "}"},
@@ -179,7 +179,7 @@ if (false) {
 		{token.BOOL, "false"},
 		{token.RPAREN, ")"},
 		{token.LBRACE, "{"},
-		{token.RETURN, "return"},
+		{token.RETURN, "balikne"},
 		{token.BOOL, "false"},
 		{token.RBRACE, "}"},
 		{token.ELIF, "elif"},
@@ -187,7 +187,7 @@ if (false) {
 		{token.BOOL, "true"},
 		{token.RPAREN, ")"},
 		{token.LBRACE, "{"},
-		{token.RETURN, "return"},
+		{token.RETURN, "balikne"},
 		{token.BOOL, "true"},
 		{token.RBRACE, "}"},
 		{token.EOF, ""},
