@@ -54,14 +54,14 @@ const (
 )
 
 var keywords = map[string]TokenType{
-	"fn":      FUNCTION,
+	"gawe":    FUNCTION,
 	"paring":  LET,
-	"if":      IF,
-	"else":    ELSE,
+	"menawa":  IF,
+	"liyane":  ELSE,
+	"nanging": ELIF,
 	"balikne": RETURN,
-	"elif":    ELIF,
-	"true":    BOOL,
-	"false":   BOOL,
+	"bener":   BOOL,
+	"salah":   BOOL,
 }
 
 func LookupIndent(indent string) TokenType {
