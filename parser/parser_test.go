@@ -8,16 +8,16 @@ import (
 
 func TestLetStatements(t *testing.T) {
 	input := `
-  paring x  5;
-  paring  = 21;
-  paring 399;
+  paring x = 5;
+  paring y   = 21;
+  paring endo = 399;
   `
 
 	l := lexer.New(input)
 	p := New(l)
 
 	program := p.ParseProgram()
-  checkParseError(t,p)
+	checkParseError(t, p)
 
 	if program == nil {
 		t.Fatalf("ParseProgram() returned nil")
@@ -66,6 +66,33 @@ func testLetStatement(t *testing.T, s ast.Statement, name string) bool {
 	}
 
 	return true
+}
+
+func TestReturnStatements(t *testing.T) {
+	input := `
+balikne 5;
+balikne 10;
+balikne 993322;
+`
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParseError(t, p)
+	if len(program.Statements) != 3 {
+		t.Fatalf("program.Statements does not contain 3 statements. got=%d",
+			len(program.Statements))
+	}
+	for _, stmt := range program.Statements {
+		returnStmt, ok := stmt.(*ast.ReturnStatement)
+		if !ok {
+			t.Errorf("stmt not *ast.returnStatement. got=%T", stmt)
+			continue
+		}
+		if returnStmt.TokenLiteral() != "balikne" {
+			t.Errorf("returnStmt.TokenLiteral not 'return', got %q",
+				returnStmt.TokenLiteral())
+		}
+	}
 }
 
 func checkParseError(t *testing.T, p *Parser) {
