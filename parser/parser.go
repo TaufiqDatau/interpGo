@@ -7,6 +7,17 @@ import (
 	"interpGo/token"
 )
 
+const (
+	_ int = iota
+	LOWEST
+	EQUALS
+	LESSGREATER // > or <
+	SUM         // +
+	PRODUCT     // *
+	PREFIX      // -X or !X
+	CALL        // myFunction(X)
+)
+
 type (
 	prefixParserFn func() ast.Expression
 	infixParserFn  func(ast.Expression) ast.Expression
@@ -29,7 +40,15 @@ func New(l *lexer.Lexer) *Parser {
 	p.nextToken()
 	p.nextToken()
 
+	p.prefixParserFns = make(map[token.TokenType]prefixParserFn)
+	p.registerPrefix(token.IDENT, p.parseIdentifier)
+  p.registerPrefix(token.INT, p.parseIntegerLiteral)
+
 	return p
+}
+
+func (p *Parser) parseIdentifier() ast.Expression {
+	return &ast.Identifier{Token: p.currToken, Value: p.currToken.Literal}
 }
 
 func (p *Parser) nextToken() {
@@ -68,7 +87,7 @@ func (p *Parser) parseStatement() ast.Statement {
 	case token.RETURN:
 		return p.parseReturnStatement()
 	default:
-		return nil
+    return p.parseExpressionStatement()
 	}
 }
 
@@ -102,7 +121,6 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 	}
 
 	return stmt
-
 }
 
 func (p *Parser) curTokenIs(t token.TokenType) bool {
@@ -129,4 +147,42 @@ func (p *Parser) registerPrefix(tokenType token.TokenType, fn prefixParserFn) {
 
 func (p *Parser) registerInfix(tokenType token.TokenType, fn infixParserFn) {
 	p.infixParserFns[tokenType] = fn
+}
+
+func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
+	stmt := &ast.ExpressionStatement{Token: p.currToken}
+
+	stmt.Expression = p.parseExpression(LOWEST)
+
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+
+	return stmt
+}
+
+func (p *Parser) parseExpression(precendece int) ast.Expression {
+	prefix := p.prefixParserFns[p.currToken.Type]
+
+	if prefix == nil {
+		return nil
+	}
+
+	leftExp := prefix()
+	return leftExp
+}
+
+func (p *Parser) parseIntegerLiteral() ast.Expression {
+	lit := &ast.IntegerLiteral{Token: p.currToken}
+
+	value, err := strconv.ParseInt(p.currToken.Literal, 0, 64)
+	if err != nil {
+		msg := fmt.Sprintf("could not parse %q as integer", p.currToken.Literal)
+		p.errors = append(p.errors, msg)
+		return nil
+	}
+
+  lit.Value = value
+
+  return lit
 }
