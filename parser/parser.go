@@ -5,6 +5,8 @@ import (
 	"interpGo/ast"
 	"interpGo/lexer"
 	"interpGo/token"
+	"log"
+	"strconv"
 )
 
 const (
@@ -42,7 +44,9 @@ func New(l *lexer.Lexer) *Parser {
 
 	p.prefixParserFns = make(map[token.TokenType]prefixParserFn)
 	p.registerPrefix(token.IDENT, p.parseIdentifier)
-  p.registerPrefix(token.INT, p.parseIntegerLiteral)
+	p.registerPrefix(token.INT, p.parseIntegerLiteral)
+	p.registerPrefix(token.BANG, p.parsePrefixOperation)
+	p.registerPrefix(token.MINUS, p.parsePrefixOperation)
 
 	return p
 }
@@ -68,6 +72,8 @@ func (p *Parser) ParseProgram() *ast.Program {
 		p.nextToken()
 	}
 
+	log.Println(program)
+
 	return program
 }
 
@@ -87,7 +93,7 @@ func (p *Parser) parseStatement() ast.Statement {
 	case token.RETURN:
 		return p.parseReturnStatement()
 	default:
-    return p.parseExpressionStatement()
+		return p.parseExpressionStatement()
 	}
 }
 
@@ -161,10 +167,16 @@ func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
 	return stmt
 }
 
+func (p *Parser) noPrefixParseFnError(t token.TokenType) {
+	msg := fmt.Sprintf("no prefix parse function for %s found", t)
+	p.errors = append(p.errors, msg)
+}
+
 func (p *Parser) parseExpression(precendece int) ast.Expression {
 	prefix := p.prefixParserFns[p.currToken.Type]
 
 	if prefix == nil {
+		p.noPrefixParseFnError(p.currToken.Type)
 		return nil
 	}
 
@@ -182,7 +194,20 @@ func (p *Parser) parseIntegerLiteral() ast.Expression {
 		return nil
 	}
 
-  lit.Value = value
+	lit.Value = value
 
-  return lit
+	return lit
+}
+
+func (p *Parser) parsePrefixOperation() ast.Expression {
+	expression := &ast.PrefixExpression{
+		Token:    p.currToken,
+		Operator: p.currToken.Literal,
+	}
+
+	p.nextToken()
+
+	expression.Right = p.parseExpression(PREFIX)
+
+	return expression
 }
