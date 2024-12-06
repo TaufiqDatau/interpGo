@@ -18,7 +18,7 @@ func TestLetStatements(t *testing.T) {
 	p := New(l)
 
 	program := p.ParseProgram()
-	checkParseError(t, p)
+	checkParserError(t, p)
 
 	if program == nil {
 		t.Fatalf("ParseProgram() returned nil")
@@ -41,6 +41,36 @@ func TestLetStatements(t *testing.T) {
 		if !testLetStatement(t, stmt, tt.expectedIdentifier) {
 			return
 		}
+	}
+}
+func TestIdentifierExpression(t *testing.T) {
+	input := "foobar;"
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserError(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("program has not enough statements. got=%d",
+			len(program.Statements))
+	}
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not ast.ExpressionStatement. got=%T",
+			program.Statements[0])
+	}
+
+	ident, ok := stmt.Expression.(*ast.Identifier)
+	if !ok {
+		t.Fatalf("exp not *ast.Identifier. got=%T", stmt.Expression)
+	}
+	if ident.Value != "foobar" {
+		t.Errorf("ident.Value not %s. got=%s", "foobar", ident.Value)
+	}
+	if ident.TokenLiteral() != "foobar" {
+		t.Errorf("ident.TokenLiteral not %s. got=%s", "foobar",
+			ident.TokenLiteral())
 	}
 }
 
@@ -78,7 +108,7 @@ balikne 993322;
 	l := lexer.New(input)
 	p := New(l)
 	program := p.ParseProgram()
-	checkParseError(t, p)
+	checkParserError(t, p)
 	if len(program.Statements) != 3 {
 		t.Fatalf("program.Statements does not contain 3 statements. got=%d",
 			len(program.Statements))
@@ -96,7 +126,7 @@ balikne 993322;
 	}
 }
 
-func checkParseError(t *testing.T, p *Parser) {
+func checkParserError(t *testing.T, p *Parser) {
 	errors := p.errors
 	if len(errors) == 0 {
 		return
@@ -113,7 +143,7 @@ func TestIntegerLiteralExpression(t *testing.T) {
 	l := lexer.New(input)
 	p := New(l)
 	program := p.ParseProgram()
-	checkParseError(t, p)
+	checkParserError(t, p)
 	if len(program.Statements) != 1 {
 		t.Fatalf("program has not enough statements. got=%d",
 			len(program.Statements))
@@ -148,7 +178,7 @@ func TestParsingPrefixExpressions(t *testing.T) {
 		l := lexer.New(tt.input)
 		p := New(l)
 		program := p.ParseProgram()
-		checkParseError(t, p)
+		checkParserError(t, p)
 		if len(program.Statements) != 1 {
 			t.Fatalf("program.Statements does not contain %d statements. got=%d\n",
 				1, len(program.Statements))
@@ -172,7 +202,7 @@ func TestParsingPrefixExpressions(t *testing.T) {
 	}
 }
 
-func testIntegerLiteral(t *testing.T, il ast.Expression, value int64) bool {
+func testIntegerLiteral(t *testing.T, il ast.IExpression, value int64) bool {
 	integ, ok := il.(*ast.IntegerLiteral)
 	if !ok {
 		t.Errorf("il not *ast.IntegerLiteral. got=%T", il)
@@ -188,4 +218,55 @@ func testIntegerLiteral(t *testing.T, il ast.Expression, value int64) bool {
 		return false
 	}
 	return true
+}
+
+func TestParsingInfixExpressions(t *testing.T) {
+	infixTests := []struct {
+		input      string
+		leftValue  interface{}
+		operator   string
+		rightValue interface{}
+	}{
+		{"5 + 5;", 5, "+", 5},
+		{"5 - 5;", 5, "-", 5},
+		{"5 * 5;", 5, "*", 5},
+		{"5 / 5;", 5, "/", 5},
+		{"5 > 5;", 5, ">", 5},
+		{"5 < 5;", 5, "<", 5},
+		{"5 == 5;", 5, "==", 5},
+		{"5 != 5;", 5, "!=", 5},
+		{"foobar + barfoo;", "foobar", "+", "barfoo"},
+		{"foobar - barfoo;", "foobar", "-", "barfoo"},
+		{"foobar * barfoo;", "foobar", "*", "barfoo"},
+		{"foobar / barfoo;", "foobar", "/", "barfoo"},
+		{"foobar > barfoo;", "foobar", ">", "barfoo"},
+		{"foobar < barfoo;", "foobar", "<", "barfoo"},
+		{"foobar == barfoo;", "foobar", "==", "barfoo"},
+		{"foobar != barfoo;", "foobar", "!=", "barfoo"},
+		{"true == true", true, "==", true},
+		{"true != false", true, "!=", false},
+		{"false == false", false, "==", false},
+	}
+
+	for _, tt := range infixTests {
+		l := lexer.New(tt.input)
+		p := New(l)
+		program := p.ParseProgram()
+		checkParserError(t, p)
+
+		if len(program.Statements) != 1 {
+			t.Fatalf("program.Statements does not contain %d statements. got=%d\n",
+				1, len(program.Statements))
+		}
+
+		stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+		if !ok {
+			t.Fatalf("program.Statements[0] is not ast.ExpressionStatement. got=%T",
+				program.Statements[0])
+		}
+
+		if !testIntegerLiteral(t, stmt., tt.integerValue) {
+			return
+		}
+	}
 }

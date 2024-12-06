@@ -21,14 +21,14 @@ const (
 )
 
 type (
-	prefixParserFn func() ast.Expression
-	infixParserFn  func(ast.Expression) ast.Expression
+	prefixParserFn func() ast.IExpression
+	infixParserFn  func(ast.IExpression) ast.IExpression
 )
 type Parser struct {
 	l               *lexer.Lexer
+	errors          []string
 	currToken       token.Token
 	peekToken       token.Token
-	errors          []string
 	prefixParserFns map[token.TokenType]prefixParserFn
 	infixParserFns  map[token.TokenType]infixParserFn
 }
@@ -51,7 +51,7 @@ func New(l *lexer.Lexer) *Parser {
 	return p
 }
 
-func (p *Parser) parseIdentifier() ast.Expression {
+func (p *Parser) parseIdentifier() ast.IExpression {
 	return &ast.Identifier{Token: p.currToken, Value: p.currToken.Literal}
 }
 
@@ -172,11 +172,12 @@ func (p *Parser) noPrefixParseFnError(t token.TokenType) {
 	p.errors = append(p.errors, msg)
 }
 
-func (p *Parser) parseExpression(precendece int) ast.Expression {
+func (p *Parser) parseExpression(precendece int) ast.IExpression {
 	prefix := p.prefixParserFns[p.currToken.Type]
 
 	if prefix == nil {
 		p.noPrefixParseFnError(p.currToken.Type)
+
 		return nil
 	}
 
@@ -184,7 +185,7 @@ func (p *Parser) parseExpression(precendece int) ast.Expression {
 	return leftExp
 }
 
-func (p *Parser) parseIntegerLiteral() ast.Expression {
+func (p *Parser) parseIntegerLiteral() ast.IExpression {
 	lit := &ast.IntegerLiteral{Token: p.currToken}
 
 	value, err := strconv.ParseInt(p.currToken.Literal, 0, 64)
@@ -199,7 +200,7 @@ func (p *Parser) parseIntegerLiteral() ast.Expression {
 	return lit
 }
 
-func (p *Parser) parsePrefixOperation() ast.Expression {
+func (p *Parser) parsePrefixOperation() ast.IExpression {
 	expression := &ast.PrefixExpression{
 		Token:    p.currToken,
 		Operator: p.currToken.Literal,
@@ -211,3 +212,4 @@ func (p *Parser) parsePrefixOperation() ast.Expression {
 
 	return expression
 }
+
