@@ -144,7 +144,8 @@ func isDigit(ch byte) bool {
 }
 
 func (l *Lexer) skipWhiteSpaces() {
-	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
+	for l.ch == ' ' ||
+		l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
 		l.readChar()
 	}
 }

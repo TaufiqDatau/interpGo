@@ -24,6 +24,7 @@ type (
 	prefixParserFn func() ast.IExpression
 	infixParserFn  func(ast.IExpression) ast.IExpression
 )
+
 type Parser struct {
 	l               *lexer.Lexer
 	errors          []string
@@ -80,6 +81,7 @@ func (p *Parser) ParseProgram() *ast.Program {
 func (p *Parser) Errors() []string {
 	return p.errors
 }
+
 func (p *Parser) peekError(t token.TokenType) {
 	msg := fmt.Sprintf("expected next token to be %s, got %s instead",
 		t, p.peekToken.Type)
@@ -212,4 +214,3 @@ func (p *Parser) parsePrefixOperation() ast.IExpression {
 
 	return expression
 }
-
