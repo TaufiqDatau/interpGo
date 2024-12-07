@@ -2,11 +2,12 @@ package parser
 
 import (
 	"fmt"
+	"log"
+	"strconv"
+
 	"interpGo/ast"
 	"interpGo/lexer"
 	"interpGo/token"
-	"log"
-	"strconv"
 )
 
 const (
