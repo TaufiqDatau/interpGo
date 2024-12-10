@@ -2,12 +2,13 @@ package ast
 
 import (
 	"bytes"
+
 	"interpGo/token"
 )
 
 // Every node in AST has to implement this interface
 type Node interface {
-	TokenLiteral() string //Token literal will be used for debugging and testing
+	TokenLiteral() string // Token literal will be used for debugging and testing
 	String() string
 }
 
@@ -33,6 +34,7 @@ func (p *Program) TokenLiteral() string {
 	}
 }
 
+// Every node in AST has to implement this interface
 func (p *Program) String() string {
 	var out bytes.Buffer
 
@@ -50,7 +52,8 @@ type LetStatement struct {
 }
 
 // Declaring function for let statement
-func (ls *LetStatement) statementNode()       {}
+func (ls *LetStatement) statementNode() {}
+
 func (ls *LetStatement) TokenLiteral() string { return ls.Token.Literal }
 
 func (ls *LetStatement) String() string {
@@ -74,7 +77,8 @@ type ReturnStatement struct {
 }
 
 // Declaring function for return statement
-func (rs *ReturnStatement) statementNode()       {}
+func (rs *ReturnStatement) statementNode() {}
+
 func (rs *ReturnStatement) TokenLiteral() string { return rs.Token.Literal }
 
 func (rs *ReturnStatement) String() string {
@@ -96,7 +100,8 @@ type Identifier struct {
 	Value string
 }
 
-func (i *Identifier) expressionNode()      {}
+func (i *Identifier) expressionNode() {}
+
 func (i *Identifier) TokenLiteral() string { return i.Token.Literal }
 
 func (i *Identifier) String() string {
@@ -108,8 +113,10 @@ type ExpressionStatement struct {
 	Expression IExpression
 }
 
-func (es *ExpressionStatement) statementNode()       {}
+func (es *ExpressionStatement) statementNode() {}
+
 func (es *ExpressionStatement) TokenLiteral() string { return es.Token.Literal }
+
 func (es *ExpressionStatement) String() string {
 	if es.Expression != nil {
 		return es.Expression.String()
@@ -122,9 +129,11 @@ type IntegerLiteral struct {
 	Value int64
 }
 
-func (il *IntegerLiteral) expressionNode()      {}
+func (il *IntegerLiteral) expressionNode() {}
+
 func (il *IntegerLiteral) TokenLiteral() string { return il.Token.Literal }
-func (il *IntegerLiteral) String() string       { return il.Token.Literal }
+
+func (il *IntegerLiteral) String() string { return il.Token.Literal }
 
 type PrefixExpression struct {
 	Token    token.Token
@@ -132,8 +141,10 @@ type PrefixExpression struct {
 	Right    IExpression
 }
 
-func (pe *PrefixExpression) expressionNode()      {}
+func (pe *PrefixExpression) expressionNode() {}
+
 func (pe *PrefixExpression) TokenLiteral() string { return pe.Token.Literal }
+
 func (pe *PrefixExpression) String() string {
 	var out bytes.Buffer
 
@@ -146,21 +157,23 @@ func (pe *PrefixExpression) String() string {
 }
 
 type InfixExpression struct {
-  Token    token.Token
-  Left      IExpression
-  Operator string
-  Right     IExpression
+	Token    token.Token
+	Left     IExpression
+	Operator string
+	Right    IExpression
 }
 
-func (ie *InfixExpression) expressionNode(){}
-func (ie *InfixExpression) TokenLiteral() string { return ie.Token.Literal}
-func (ie *InfixExpression) String() string{
-  var out bytes.Buffer
+func (ie *InfixExpression) expressionNode() {}
 
-  out.WriteString("(")
-  out.WriteString(ie.Left.String())
-  out.WriteString(" "+ ie.Operator + " ")
-  out.WriteString(ie.Right.String())
+func (ie *InfixExpression) TokenLiteral() string { return ie.Token.Literal }
 
-  return out.String()
+func (ie *InfixExpression) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("(")
+	out.WriteString(ie.Left.String())
+	out.WriteString(" " + ie.Operator + " ")
+	out.WriteString(ie.Right.String())
+
+	return out.String()
 }

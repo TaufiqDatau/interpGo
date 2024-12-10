@@ -2,13 +2,23 @@ package parser
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 
 	"interpGo/ast"
 	"interpGo/lexer"
 	"interpGo/token"
 )
+
+var precendece = map[token.TokenType]int{
+	token.EQ:       EQUALS,
+	token.NEQ:      EQUALS,
+	token.LT:       LESSGREATER,
+	token.GT:       LESSGREATER,
+	token.PLUS:     SUM,
+	token.MINUS:    SUM,
+	token.SLASH:    PRODUCT,
+	token.ASTERISK: PRODUCT,
+}
 
 const (
 	_ int = iota
@@ -50,6 +60,18 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.BANG, p.parsePrefixOperation)
 	p.registerPrefix(token.MINUS, p.parsePrefixOperation)
 
+	p.infixParserFns = make(map[token.TokenType]infixParserFn)
+	p.registerInfix(token.PLUS, p.parseInfixOperation)
+	p.registerInfix(token.MINUS, p.parseInfixOperation)
+	p.registerInfix(token.SLASH, p.parseInfixOperation)
+	p.registerInfix(token.ASTERISK, p.parseInfixOperation)
+	p.registerInfix(token.EQ, p.parseInfixOperation)
+	p.registerInfix(token.NEQ, p.parseInfixOperation)
+	p.registerInfix(token.LT, p.parseInfixOperation)
+	p.registerInfix(token.GT, p.parseInfixOperation)
+	p.registerInfix(token.GTE, p.parseInfixOperation)
+	p.registerInfix(token.LTE, p.parseInfixOperation)
+
 	return p
 }
 
@@ -73,8 +95,6 @@ func (p *Parser) ParseProgram() *ast.Program {
 		}
 		p.nextToken()
 	}
-
-	log.Println(program)
 
 	return program
 }
@@ -185,6 +205,17 @@ func (p *Parser) parseExpression(precendece int) ast.IExpression {
 	}
 
 	leftExp := prefix()
+
+	for !p.peekTokenIs(token.SEMICOLON) && precendece < p.peekPrecedence() {
+		infix := p.infixParserFns[p.peekToken.Type]
+		if infix == nil {
+			return leftExp
+		}
+
+		p.nextToken()
+
+		leftExp = infix(leftExp)
+	}
 	return leftExp
 }
 
@@ -214,4 +245,34 @@ func (p *Parser) parsePrefixOperation() ast.IExpression {
 	expression.Right = p.parseExpression(PREFIX)
 
 	return expression
+}
+
+func (p *Parser) parseInfixOperation(left ast.IExpression) ast.IExpression {
+	expression := &ast.InfixExpression{
+		Token:    p.currentToken,
+		Operator: p.currentToken.Literal,
+		Left:     left,
+	}
+
+	precendece := p.currentPrecedence()
+	p.nextToken()
+	expression.Right = p.parseExpression(precendece)
+
+	return expression
+}
+
+func (p *Parser) peekPrecedence() int {
+	if p, ok := precendece[p.peekToken.Type]; ok {
+		return p
+	}
+
+	return LOWEST
+}
+
+func (p *Parser) currentPrecedence() int {
+	if p, ok := precendece[p.currentToken.Type]; ok {
+		return p
+	}
+
+	return LOWEST
 }
