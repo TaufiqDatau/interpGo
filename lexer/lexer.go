@@ -13,11 +13,11 @@ type Lexer struct {
 
 func New(input string) *Lexer {
 	l := &Lexer{input: input}
-	l.readChar()
+	l.readCharacter()
 	return l
 }
 
-func (l *Lexer) readChar() {
+func (l *Lexer) readCharacter() {
 	if l.readPosition >= len(l.input) {
 		l.ch = 0
 	} else {
@@ -31,12 +31,12 @@ func (l *Lexer) readChar() {
 func (l *Lexer) NextToken() token.Token {
 	var tok token.Token
 
-	l.skipWhiteSpaces()
+	l.whiteSpacesIgnorer()
 
 	switch l.ch {
 	case '=':
-		if l.peekNext() == '=' {
-			l.readChar()
+		if l.peekNextCharacter() == '=' {
+			l.readCharacter()
 			tok.Literal = "=="
 			tok.Type = token.EQ
 		} else {
@@ -51,24 +51,24 @@ func (l *Lexer) NextToken() token.Token {
 	case '/':
 		tok = newToken(token.SLASH, l.ch)
 	case '!':
-		if l.peekNext() == '=' {
-			l.readChar()
+		if l.peekNextCharacter() == '=' {
+			l.readCharacter()
 			tok.Literal = "!="
 			tok.Type = token.NEQ
 		} else {
 			tok = newToken(token.BANG, l.ch)
 		}
 	case '<':
-		if l.peekNext() == '=' {
-			l.readChar()
+		if l.peekNextCharacter() == '=' {
+			l.readCharacter()
 			tok.Type = token.LTE
 			tok.Literal = "<="
 		} else {
 			tok = newToken(token.LT, l.ch)
 		}
 	case '>':
-		if l.peekNext() == '=' {
-			l.readChar()
+		if l.peekNextCharacter() == '=' {
+			l.readCharacter()
 			tok.Type = token.GTE
 			tok.Literal = ">="
 		} else {
@@ -101,14 +101,14 @@ func (l *Lexer) NextToken() token.Token {
 			tok = newToken(token.ILLEGAL, l.ch)
 		}
 	}
-	l.readChar()
+	l.readCharacter()
 	return tok
 }
 
 func readIdentifier(l *Lexer) string {
 	position := l.position
 	for isLetter(l.ch) {
-		l.readChar()
+		l.readCharacter()
 	}
 	return l.input[position:l.position]
 }
@@ -120,7 +120,7 @@ func readNumber(l *Lexer) (string, token.TokenType) {
 		if l.ch == '.' {
 			isFloat = true
 		}
-		l.readChar()
+		l.readCharacter()
 	}
 	var tokenType string
 	if isFloat {
@@ -143,14 +143,14 @@ func isDigit(ch byte) bool {
 	return '0' <= ch && ch <= '9'
 }
 
-func (l *Lexer) skipWhiteSpaces() {
+func (l *Lexer) whiteSpacesIgnorer() {
 	for l.ch == ' ' ||
 		l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
-		l.readChar()
+		l.readCharacter()
 	}
 }
 
-func (l *Lexer) peekNext() byte {
+func (l *Lexer) peekNextCharacter() byte {
 	nextPos := l.position + 1
 	if nextPos > len(l.input) {
 		return 0
