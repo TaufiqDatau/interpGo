@@ -274,7 +274,7 @@ func (p *Parser) parseInfixOperation(left ast.IExpression) ast.IExpression {
 	p.nextToken()
 
 	if expression.Operator == "+" {
-		expression.Right = p.parseExpression(precendece - 1)
+		expression.Right = p.parseExpression(precendece)
 	} else {
 		expression.Right = p.parseExpression(precendece)
 	}
